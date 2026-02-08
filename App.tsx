@@ -51,10 +51,28 @@ export default function App() {
   const isConnected = connectionState === ConnectionState.CONNECTED;
   const isConnecting = connectionState === ConnectionState.CONNECTING;
 
+  // Update theme color meta tag dynamically
+  useEffect(() => {
+    const metaThemeColor = document.querySelector("meta[name=theme-color]");
+    if (metaThemeColor) {
+        // Approximate hex values for themes or use white/black for simplicity in PWA
+        const color = currentTheme.id === 'light' ? '#ffffff' : '#0f172a';
+        metaThemeColor.setAttribute("content", color);
+    }
+  }, [currentTheme]);
+
   return (
-    <div className={`min-h-screen ${currentTheme.colors.bg} transition-colors duration-300 flex flex-col items-center font-sans`}>
+    <div 
+      className={`h-[100dvh] w-full ${currentTheme.colors.bg} transition-colors duration-300 flex flex-col items-center font-sans overflow-hidden`}
+      style={{
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        paddingLeft: 'env(safe-area-inset-left)',
+        paddingRight: 'env(safe-area-inset-right)',
+      }}
+    >
       {/* Header */}
-      <header className={`w-full ${currentTheme.colors.card} border-b ${currentTheme.colors.border} py-3 px-4 md:px-8 flex flex-col md:flex-row items-center justify-between sticky top-0 z-40 shadow-sm gap-4 md:gap-0`}>
+      <header className={`w-full shrink-0 ${currentTheme.colors.card} border-b ${currentTheme.colors.border} py-3 px-4 md:px-8 flex flex-col md:flex-row items-center justify-between z-40 shadow-sm gap-4 md:gap-0`}>
         
         {/* Logo Area */}
         <div className="flex items-center gap-2">
@@ -107,13 +125,14 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 w-full max-w-7xl p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start h-[calc(100vh-80px)]">
+      {/* Main Content: Scrollable */}
+      <main className="flex-1 w-full max-w-7xl p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start overflow-y-auto">
         
         {/* Left Column: Controls & Visualizer */}
-        <div className="lg:col-span-5 flex flex-col gap-6 h-full justify-center">
+        <div className="lg:col-span-5 flex flex-col gap-6 justify-center min-h-min">
             
             {/* Status Card / Avatar */}
-            <div className={`${currentTheme.colors.card} rounded-[2rem] shadow-2xl border ${currentTheme.colors.border} p-8 flex flex-col items-center justify-center min-h-[500px] transition-colors duration-300 relative overflow-hidden bg-opacity-50`}>
+            <div className={`${currentTheme.colors.card} rounded-[2rem] shadow-2xl border ${currentTheme.colors.border} p-8 flex flex-col items-center justify-center min-h-[400px] md:min-h-[500px] transition-colors duration-300 relative overflow-hidden bg-opacity-50`}>
                 
                 <AvatarVisualizer 
                     profile={selectedLanguage}
@@ -172,15 +191,15 @@ export default function App() {
         </div>
 
         {/* Right Column: Transcript */}
-        <div className={`lg:col-span-7 ${currentTheme.colors.card} rounded-[2rem] shadow-xl border ${currentTheme.colors.border} flex flex-col h-[500px] lg:h-full overflow-hidden transition-colors duration-300`}>
-            <div className={`p-5 border-b ${currentTheme.colors.border} ${currentTheme.colors.bg} bg-opacity-50 flex justify-between items-center backdrop-blur-md`}>
+        <div className={`lg:col-span-7 ${currentTheme.colors.card} rounded-[2rem] shadow-xl border ${currentTheme.colors.border} flex flex-col h-[400px] lg:h-[calc(100vh-140px)] overflow-hidden transition-colors duration-300`}>
+            <div className={`p-5 border-b ${currentTheme.colors.border} ${currentTheme.colors.bg} bg-opacity-50 flex justify-between items-center backdrop-blur-md sticky top-0 z-10`}>
                 <h3 className={`font-semibold ${currentTheme.colors.text} text-lg`}>{t.lbl_transcript}</h3>
                 <span className={`text-xs font-medium ${currentTheme.colors.subText} bg-black/5 px-3 py-1.5 rounded-full`}>
                     {transcripts.length > 0 ? (isConnected ? t.status_listening : 'Finished') : 'Waiting...'}
                 </span>
             </div>
             
-            <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6">
+            <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 selectable-text">
                 {transcripts.length === 0 && (
                     <div className={`h-full flex flex-col items-center justify-center ${currentTheme.colors.subText} opacity-30`}>
                          <MessageSquare size={64} className="mb-6" />
